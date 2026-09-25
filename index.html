@@ -2992,8 +2992,8 @@ async function gerarRelatorioAPAC() {
                 'CPF': pegar(item.cpf_paciente, p.cpf),
                 'Data Nascimento': formatarData(pegar(item.data_nascimento, p.data_nascimento)),
                 'Nome da Mãe': pegar(item.nome_mae, p.nome_mae),
-                'Sexo': pegar(item.sexo, p.sexo),
-                'Raça/Cor': pegar(item.raca_cor, p.raca_cor),
+                'Sexo': p.sexo || '',
+                'Raça/Cor': p.raca_cor || '',
                 'Telefone': pegar(item.telefone, p.telefone),
                 'CEP': pegar(item.cep, p.cep),
                 'Endereço': pegar(item.endereco_completo, p.endereco_completo),
@@ -3014,6 +3014,18 @@ async function gerarRelatorioAPAC() {
                 'Usuário Cadastrou': item.usuario_cadastrou || ''
             };
         });
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'APAC_Completo');
+        XLSX.writeFile(wb, 'relatorio_APAC_completo_' + getHoje() + '.xlsx');
+        toast('✅ Relatório APAC gerado com ' + ocis.length + ' registros!', 'success');
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao gerar relatório.', 'error');
+    }
+}
 
         const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
