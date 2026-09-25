@@ -3027,18 +3027,6 @@ async function gerarRelatorioAPAC() {
     }
 }
 
-        const ws = XLSX.utils.json_to_sheet(exportData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'APAC_Completo');
-        XLSX.writeFile(wb, 'relatorio_APAC_completo_' + getHoje() + '.xlsx');
-        toast('✅ Relatório APAC gerado com ' + ocis.length + ' registros!', 'success');
-    } catch (err) {
-        hideLoading();
-        console.error(err);
-        toast('❌ Erro ao gerar relatório.', 'error');
-    }
-}
-
 function buscarGlobal() {
     const termo = document.getElementById('globalSearch').value.trim().toLowerCase();
     if (!termo) { atualizarTudo(); return; }
