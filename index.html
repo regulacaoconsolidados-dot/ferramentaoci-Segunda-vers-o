@@ -174,9 +174,16 @@
         .btn-atualizar i { font-size: 14px; }
         .fa-spin { animation: fa-spin 1s linear infinite; }
         @keyframes fa-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* 🔥 NOVO: Botões de Ação OCI */
+        .btn-fechar-oci { background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%); color: white !important; padding: 6px 14px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin: 0 2px; border: none; box-shadow: 0 2px 6px rgba(168,85,247,0.3); }
+        .btn-fechar-oci:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(168,85,247,0.4); }
+        .btn-estornar-oci { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white !important; padding: 6px 14px; border-radius: 10px; font-size: 11px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin: 0 2px; border: none; box-shadow: 0 2px 6px rgba(245,158,11,0.3); }
+        .btn-estornar-oci:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(245,158,11,0.4); }
     </style>
 </head>
 <body>
+
 
 <!-- ============ TOAST ============ -->
 <div class="toast-container" id="toastContainer"></div>
@@ -384,9 +391,10 @@
                 <button class="tab-btn" id="tab-apac" onclick="switchTab('apac')"><i class="fas fa-file-invoice"></i> OCI Fec</button>
                 <button class="tab-btn" id="tab-apacs-geradas" onclick="switchTab('apacs-geradas')"><i class="fas fa-file-medical"></i> APAC</button>
             </div>
-                </header>
+        </header>
 
-               <div class="flex-1 overflow-y-auto p-3 md:p-5 lg:p-6" id="mainContent">
+        <div class="flex-1 overflow-y-auto p-3 md:p-5 lg:p-6" id="mainContent">
+
 
                 <div id="content-logica-indicadores" class="tab-content active space-y-5">
                 <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-5 md:p-6 text-white shadow-lg">
@@ -759,6 +767,7 @@
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Recep Retorno</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left">Exames</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left" style="min-width:160px;">Ações</th>
                             </tr></thead>
                             <tbody id="tabelaRetornosRecepcionados"></tbody>
                         </table>
@@ -866,6 +875,7 @@
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left">Local</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Fechamento</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left" style="min-width:120px;">Ações</th>
                             </tr></thead>
                             <tbody id="tabelaAPAC"></tbody>
                         </table>
@@ -909,6 +919,7 @@
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data 1ª Cons</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left">Data Fechamento</th>
                                 <th class="px-2 py-2 text-xs font-bold uppercase text-left bg-indigo-50">Nº APAC</th>
+                                <th class="px-2 py-2 text-xs font-bold uppercase text-left" style="min-width:120px;">Ações</th>
                             </tr></thead>
                             <tbody id="tabelaAPACSGeradas"></tbody>
                         </table>
@@ -921,6 +932,8 @@
     </main>
 </div>
 
+
+<!-- ============ MODAL ADMIN ============ -->
 <div id="modalAdmin" class="modal-overlay">
     <div class="bg-white rounded-3xl p-6 w-full max-w-4xl shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-5">
@@ -1093,7 +1106,104 @@
     </div>
 </div>
 
+<!-- ============ 🔥 NOVO: MODAL FECHAR OCI ============ -->
+<div id="modalFecharOCI" class="modal-overlay">
+    <div class="bg-white rounded-3xl p-6 md:p-8 w-full max-w-lg shadow-2xl mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="text-center mb-6">
+            <div class="w-20 h-20 bg-gradient-to-br from-purple-100 to-fuchsia-200 text-purple-600 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-lg">🔒</div>
+            <h2 class="text-xl font-extrabold text-slate-800">Fechar OCI</h2>
+            <p class="text-sm text-slate-500 mt-1">Confirme os dados antes de finalizar</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-purple-50 to-fuchsia-50 border-2 border-purple-100 rounded-2xl p-5 mb-5 space-y-2">
+            <div class="flex justify-between text-sm">
+                <span class="text-slate-500 font-bold">Nº Solicitação:</span>
+                <span class="font-extrabold text-purple-700" id="fecharOCINumero">—</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-slate-500 font-bold">Paciente:</span>
+                <span class="font-extrabold text-slate-800" id="fecharOCIPaciente">—</span>
+            </div>
+            <div class="flex justify-between text-sm">
+                <span class="text-slate-500 font-bold">Especialidade:</span>
+                <span class="font-extrabold text-slate-800" id="fecharOCIEsp">—</span>
+            </div>
+        </div>
+
+        <div class="bg-amber-50 border-2 border-amber-200 rounded-xl p-4 mb-5">
+            <p class="text-xs text-amber-700 font-bold flex items-start gap-2">
+                <i class="fas fa-exclamation-triangle mt-0.5"></i>
+                <span><strong>Atenção:</strong> Após fechar a OCI, o paciente sai da lista de retornos recepcionados e vai para "OCIs Fechadas". Você poderá estornar depois se necessário.</span>
+            </p>
+        </div>
+
+        <input type="hidden" id="fecharOCIId">
+
+        <div class="space-y-3 mb-6">
+            <p class="text-sm font-extrabold text-slate-700 mb-3">Escolha uma opção:</p>
+            
+            <label class="block cursor-pointer p-3 border-2 border-purple-100 rounded-xl hover:bg-purple-50 transition-all">
+                <input type="radio" name="opcaoFechar" value="sem_apac" checked onchange="toggleCampoAPAC()" class="mr-2 w-4 h-4 accent-purple-500">
+                <span class="font-bold text-slate-800">🔒 Fechar OCI sem APAC</span>
+                <p class="text-xs text-slate-500 ml-6 mt-1">Caso encerrado sem procedimento de alto custo</p>
+            </label>
+            
+            <label class="block cursor-pointer p-3 border-2 border-pink-100 rounded-xl hover:bg-pink-50 transition-all">
+                <input type="radio" name="opcaoFechar" value="com_apac" onchange="toggleCampoAPAC()" class="mr-2 w-4 h-4 accent-purple-500">
+                <span class="font-bold text-slate-800">📑 Fechar OCI e registrar APAC</span>
+                <p class="text-xs text-slate-500 ml-6 mt-1">Para casos que geram APAC</p>
+            </label>
+        </div>
+
+        <div id="camposAPAC" class="hidden bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 rounded-2xl p-5 mb-5">
+            <p class="text-sm font-extrabold text-pink-700 mb-4 flex items-center gap-2">
+                <i class="fas fa-file-medical"></i> Dados da APAC
+            </p>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs text-pink-600 font-bold block mb-1">Nº APAC *</label>
+                    <input type="text" id="fecharOCINumeroAPAC" placeholder="Digite o número da APAC..." class="w-full px-4 py-2 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400">
+                </div>
+                <div>
+                    <label class="text-xs text-pink-600 font-bold block mb-1">Data Emissão APAC</label>
+                    <input type="date" id="fecharOCIDataAPAC" class="w-full px-4 py-2 border-2 border-pink-200 rounded-xl text-sm outline-none focus:border-pink-400">
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button onclick="fecharModal('modalFecharOCI')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold text-sm transition-all">❌ CANCELAR</button>
+            <button onclick="confirmarFecharOCI()" class="flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white py-3 rounded-xl font-extrabold transition-all transform hover:-translate-y-0.5 shadow-lg">✅ CONFIRMAR</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============ 🔥 NOVO: MODAL ESTORNAR OCI ============ -->
+<div id="modalEstornarOCI" class="modal-overlay">
+    <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl mx-4">
+        <div class="text-center mb-5">
+            <div class="w-20 h-20 bg-gradient-to-br from-amber-100 to-orange-200 text-amber-600 rounded-3xl flex items-center justify-center text-4xl mx-auto mb-4 shadow-lg">↩️</div>
+            <h2 class="text-xl font-extrabold text-slate-800">Estornar OCI</h2>
+            <p class="text-sm text-slate-500 mt-1">Esta ação volta o status anterior</p>
+        </div>
+        
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-5 mb-5">
+            <p class="text-sm text-slate-700 mb-3" id="estornarOCITexto">Tem certeza que deseja estornar esta OCI?</p>
+            <p class="text-xs text-amber-700 font-bold mt-2" id="estornarOCIInfo"></p>
+        </div>
+
+        <input type="hidden" id="estornarOCIId">
+        <input type="hidden" id="estornarOCIStatusAtual">
+
+        <div class="flex gap-3">
+            <button onclick="confirmarEstornarOCI()" class="flex-1 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white py-3 rounded-xl font-extrabold transition-all transform hover:-translate-y-0.5 shadow-lg">↩️ ESTORNAR</button>
+            <button onclick="fecharModal('modalEstornarOCI')" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-all">CANCELAR</button>
+        </div>
+    </div>
+</div>
+
 <script>
+
 // ============================================
 // 🏥 FERRAMENTA OCI v7.0 - PARTE 5
 // Config + Login + Lógica P↔R
@@ -1263,6 +1373,10 @@ function podeVerDadosCompletos() {
     return usuarioLogado && (usuarioLogado.tipo === 'admin' || usuarioLogado.tipo === 'admin_apac');
 }
 function podeGerarRelatorioAPAC() {
+    return usuarioLogado && (usuarioLogado.tipo === 'admin' || usuarioLogado.tipo === 'admin_apac');
+}
+// 🔥 NOVO: quem pode fechar/estornar OCI
+function podeFecharEstornarOCI() {
     return usuarioLogado && (usuarioLogado.tipo === 'admin' || usuarioLogado.tipo === 'admin_apac');
 }
 
@@ -1546,6 +1660,7 @@ document.getElementById('loginSenha').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') document.getElementById('btnLogin').click();
 });
 
+
 // ============================================
 // 🏥 FERRAMENTA OCI v7.0 - PARTE 6
 // Tabelas + Timeline + Filtros
@@ -1709,6 +1824,24 @@ function getNomesExames(item) {
     } catch(e) { return '—'; }
 }
 
+// ============================================
+// 🔥 MONTAR BOTÕES DE AÇÃO (Fechar / Estornar OCI)
+// ============================================
+function montarBotoesAcao(status, registroId) {
+    if (!podeFecharEstornarOCI()) return '';
+    let botoes = '';
+    if (status === 'retorno_recepcionado') {
+        botoes += '<button onclick="abrirModalFecharOCI(' + registroId + ')" class="btn-fechar-oci"><i class="fas fa-lock"></i> Fechar OCI</button>';
+    }
+    if (status === 'oci_fechada') {
+        botoes += '<button onclick="abrirModalEstornarOCI(' + registroId + ', \'oci_fechada\')" class="btn-estornar-oci"><i class="fas fa-undo"></i> Estornar</button>';
+    }
+    if (status === 'apac_gerada') {
+        botoes += '<button onclick="abrirModalEstornarOCI(' + registroId + ', \'apac_gerada\')" class="btn-estornar-oci"><i class="fas fa-undo"></i> Estornar</button>';
+    }
+    return botoes;
+}
+
 function gerarLinhaTabela(tipo, item) {
     const p = item.p || item;
     const r = item.r || null;
@@ -1813,6 +1946,8 @@ function gerarLinhaTabela(tipo, item) {
     }
 
     if (tipo === 'retornos-recepcionados') {
+        const idRegistro = (r && r.id) ? r.id : (p && p.id ? p.id : null);
+        const botoes = montarBotoesAcao('retorno_recepcionado', idRegistro);
         return '<tr class="hover:bg-slate-50 border-b">' +
             '<td class="px-2 py-2 text-sm font-bold text-teal-600 text-left">' + (r ? (r.numero_solicitacao || '—') : '—') + '</td>' +
             '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
@@ -1826,6 +1961,7 @@ function gerarLinhaTabela(tipo, item) {
             '<td class="px-2 py-2 text-sm font-bold text-cyan-700 text-left">' + formatarData(p.data_agendada) + '</td>' +
             '<td class="px-2 py-2 text-sm font-bold text-teal-700 text-left">' + (r ? formatarData(r.data_recepcionada || r.data_agendada) : '—') + '</td>' +
             '<td class="px-2 py-2 text-xs text-left">' + getNomesExames(p) + '</td>' +
+            '<td class="px-2 py-2 text-left">' + botoes + '</td>' +
         '</tr>';
     }
 
@@ -1859,6 +1995,8 @@ function gerarLinhaTabela(tipo, item) {
     }
 
     if (tipo === 'apac') {
+        const idRegistro = p.id || null;
+        const botoes = montarBotoesAcao('oci_fechada', idRegistro);
         return '<tr class="hover:bg-slate-50 border-b">' +
             '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
             '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
@@ -1870,10 +2008,13 @@ function gerarLinhaTabela(tipo, item) {
             '<td class="px-2 py-2 text-sm text-left">' + (p.local_consulta || '—') + '</td>' +
             '<td class="px-2 py-2 text-sm text-left">' + formatarData(p.data_agendada) + '</td>' +
             '<td class="px-2 py-2 text-sm font-bold text-purple-700 text-left">' + formatarData(p.data_fechamento) + '</td>' +
+            '<td class="px-2 py-2 text-left">' + botoes + '</td>' +
         '</tr>';
     }
 
     if (tipo === 'apacs-geradas') {
+        const idRegistro = p.id || null;
+        const botoes = montarBotoesAcao('apac_gerada', idRegistro);
         return '<tr class="hover:bg-slate-50 border-b">' +
             '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
             '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
@@ -1886,6 +2027,7 @@ function gerarLinhaTabela(tipo, item) {
             '<td class="px-2 py-2 text-sm text-left">' + formatarData(p.data_agendada) + '</td>' +
             '<td class="px-2 py-2 text-sm text-left">' + formatarData(p.data_fechamento) + '</td>' +
             '<td class="px-2 py-2 text-sm font-bold text-indigo-700 bg-indigo-50 text-left">' + (p.numero_apac || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left">' + botoes + '</td>' +
         '</tr>';
     }
 
@@ -1968,6 +2110,199 @@ function limparFiltroAPACS() {
     document.getElementById('filtroDataInicioAPACS').value = '';
     document.getElementById('filtroDataFimAPACS').value = '';
     filtrarTabela('apacs-geradas');
+}
+
+// ============================================
+// 🔥 NOVO: FECHAR OCI
+// ============================================
+function abrirModalFecharOCI(id) {
+    if (!podeFecharEstornarOCI()) {
+        toast('❌ Apenas Admin ou Admin APAC podem fechar OCI!', 'error');
+        return;
+    }
+    
+    // Procura o registro nas consultas (por id do P ou R)
+    let registro = consultas.find(c => c.id === id);
+    if (!registro) {
+        // Tenta achar pelo R
+        const grupo = gruposOCI.find(g => (g.p && g.p.id === id) || (g.r && g.r.id === id));
+        if (grupo) registro = grupo.r || grupo.p;
+    }
+    
+    if (!registro) { toast('❌ Registro não encontrado!', 'error'); return; }
+    
+    const pac = pacientes.find(x => x.id === registro.paciente_id) || {};
+    const esp = especialidades.find(e => e.id === registro.especialidade_id) || {};
+    const nomePac = registro.nome_paciente || pac.nome || '—';
+    
+    document.getElementById('fecharOCIId').value = id;
+    document.getElementById('fecharOCINumero').textContent = registro.numero_solicitacao || id;
+    document.getElementById('fecharOCIPaciente').textContent = nomePac;
+    document.getElementById('fecharOCIEsp').textContent = (esp.icone || '') + ' ' + (esp.nome || '—');
+    
+    // Reset dos campos
+    document.querySelector('input[name="opcaoFechar"][value="sem_apac"]').checked = true;
+    document.getElementById('fecharOCINumeroAPAC').value = '';
+    document.getElementById('fecharOCIDataAPAC').value = new Date().toISOString().split('T')[0];
+    toggleCampoAPAC();
+    
+    document.getElementById('modalFecharOCI').classList.add('show');
+}
+
+function toggleCampoAPAC() {
+    const opcao = document.querySelector('input[name="opcaoFechar"]:checked').value;
+    const div = document.getElementById('camposAPAC');
+    if (opcao === 'com_apac') {
+        div.classList.remove('hidden');
+    } else {
+        div.classList.add('hidden');
+    }
+}
+
+async function confirmarFecharOCI() {
+    if (!podeFecharEstornarOCI()) return;
+    
+    const id = parseInt(document.getElementById('fecharOCIId').value);
+    const opcao = document.querySelector('input[name="opcaoFechar"]:checked').value;
+    
+    if (opcao === 'com_apac') {
+        const numeroAPAC = document.getElementById('fecharOCINumeroAPAC').value.trim();
+        if (!numeroAPAC) {
+            toast('❌ Informe o Nº da APAC!', 'warning');
+            document.getElementById('fecharOCINumeroAPAC').focus();
+            return;
+        }
+    }
+    
+    showLoading();
+    
+    try {
+        const hoje = new Date().toISOString().split('T')[0];
+        
+        // 🔥 Precisa atualizar o P (1ª consulta), não o R
+        // Busca o P do grupo pelo id passado
+        let idParaAtualizar = id;
+        const grupo = gruposOCI.find(g => (g.p && g.p.id === id) || (g.r && g.r.id === id));
+        if (grupo && grupo.p) {
+            idParaAtualizar = grupo.p.id;
+        }
+        
+        let updateData = {
+            status: opcao === 'com_apac' ? 'apac_gerada' : 'oci_fechada',
+            data_fechamento: hoje,
+            usuario_cadastrou: usuarioLogado.nome,
+            updated_at: new Date().toISOString()
+        };
+        
+        if (opcao === 'com_apac') {
+            updateData.numero_apac = document.getElementById('fecharOCINumeroAPAC').value.trim();
+            const dataAPACInput = document.getElementById('fecharOCIDataAPAC').value;
+            updateData.data_apac = dataAPACInput || hoje;
+            updateData.data_emissao_apac = dataAPACInput || hoje;
+            updateData.usuario_gerou_apac = usuarioLogado.nome;
+        }
+        
+        const { error } = await supabaseClient.from('linha_cuidado').update(updateData).eq('id', idParaAtualizar);
+        
+        hideLoading();
+        
+        if (error) {
+            toast('❌ Erro ao fechar OCI: ' + error.message, 'error');
+            return;
+        }
+        
+        toast(opcao === 'com_apac' 
+            ? '✅ OCI Fechada e APAC Registrada com sucesso!' 
+            : '✅ OCI Fechada com sucesso!', 'success');
+        
+        fecharModal('modalFecharOCI');
+        
+        // Recarrega os dados
+        await carregarDadosSupabase();
+        await atualizarTudo();
+        
+    } catch(e) {
+        hideLoading();
+        console.error(e);
+        toast('❌ Erro inesperado: ' + e.message, 'error');
+    }
+}
+
+// ============================================
+// 🔥 NOVO: ESTORNAR OCI
+// ============================================
+function abrirModalEstornarOCI(id, statusAtual) {
+    if (!podeFecharEstornarOCI()) {
+        toast('❌ Apenas Admin ou Admin APAC podem estornar!', 'error');
+        return;
+    }
+    
+    let textoExplicativo = '';
+    
+    if (statusAtual === 'apac_gerada') {
+        textoExplicativo = 'Tem certeza que deseja estornar esta APAC?';
+        document.getElementById('estornarOCIInfo').textContent = '↩️ Volta para: OCI FECHADA (mantém data de fechamento)';
+    } else if (statusAtual === 'oci_fechada') {
+        textoExplicativo = 'Tem certeza que deseja reabrir esta OCI?';
+        document.getElementById('estornarOCIInfo').textContent = '↩️ Volta para: RETORNO RECEPCIONADO (75%)';
+    } else {
+        toast('❌ Este status não pode ser estornado!', 'error');
+        return;
+    }
+    
+    document.getElementById('estornarOCITexto').textContent = textoExplicativo;
+    document.getElementById('estornarOCIId').value = id;
+    document.getElementById('estornarOCIStatusAtual').value = statusAtual;
+    
+    document.getElementById('modalEstornarOCI').classList.add('show');
+}
+
+async function confirmarEstornarOCI() {
+    if (!podeFecharEstornarOCI()) return;
+    
+    const id = parseInt(document.getElementById('estornarOCIId').value);
+    const statusAtual = document.getElementById('estornarOCIStatusAtual').value;
+    
+    // 🔥 Precisa atualizar o P
+    let idParaAtualizar = id;
+    const grupo = gruposOCI.find(g => (g.p && g.p.id === id) || (g.r && g.r.id === id));
+    if (grupo && grupo.p) {
+        idParaAtualizar = grupo.p.id;
+    }
+    
+    let updateData = {
+        usuario_cadastrou: usuarioLogado.nome,
+        updated_at: new Date().toISOString()
+    };
+    
+    if (statusAtual === 'apac_gerada') {
+        // APAC → OCI Fechada (mantém data de fechamento)
+        updateData.status = 'oci_fechada';
+        updateData.numero_apac = null;
+        updateData.data_apac = null;
+        updateData.data_emissao_apac = null;
+        updateData.usuario_gerou_apac = null;
+    } else if (statusAtual === 'oci_fechada') {
+        // OCI Fechada → Retorno Recepcionado
+        updateData.status = 'retorno_recepcionado';
+        updateData.data_fechamento = null;
+    }
+    
+    showLoading();
+    const { error } = await supabaseClient.from('linha_cuidado').update(updateData).eq('id', idParaAtualizar);
+    hideLoading();
+    
+    if (error) {
+        toast('❌ Erro ao estornar: ' + error.message, 'error');
+        return;
+    }
+    
+    toast('↩️ OCI estornada com sucesso!', 'success');
+    fecharModal('modalEstornarOCI');
+    
+    // Recarrega os dados
+    await carregarDadosSupabase();
+    await atualizarTudo();
 }
 
 // ============================================
@@ -2715,7 +3050,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         gs.addEventListener('input', function(e) { if (!e.target.value.trim()) atualizarTudo(); });
     }
 
-    ['modalAdmin','modalEditarUsuario','modalRelatorioAPAC'].forEach(function(id) {
+    ['modalAdmin','modalEditarUsuario','modalRelatorioAPAC','modalFecharOCI','modalEstornarOCI'].forEach(function(id) {
         const el = document.getElementById(id);
         if (el) el.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
     });
@@ -2724,6 +3059,1403 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     console.log('✅ FERRAMENTA OCI v7.0 PRONTA!');
 });
-</script>
-</body>
-</html>
+
+
+// ============================================
+// 🏥 FERRAMENTA OCI v7.0 - PARTE 6
+// Tabelas + Timeline + Filtros
+// ============================================
+
+function getDadosFiltrados(tipo) {
+    let dados = [];
+
+    if (tipo === 'monitoramento') {
+        dados = gruposOCI.slice();
+    } else if (tipo === 'monitoramento-exames') {
+        consultas.forEach(function(c) {
+            if (c.exames_solicitados && c.exames_solicitados !== '[]' && c.exames_solicitados !== 'null') {
+                try {
+                    const exames = typeof c.exames_solicitados === 'string' ? JSON.parse(c.exames_solicitados) : c.exames_solicitados;
+                    if (Array.isArray(exames)) {
+                        exames.forEach(function(ex) {
+                           const dSol = ex.data_solicitacao || null;
+                           const dReal = ex.data_realizacao || null;
+                            let dias = '—';
+                            if (dSol && dReal) {
+                                const diff = calcularDias(dSol, dReal);
+                                if (diff >= 0) dias = diff + 'd';
+                            }
+                            dados.push({
+                                id: c.id, numero_solicitacao: c.numero_solicitacao,
+                                paciente_id: c.paciente_id, especialidade_id: c.especialidade_id,
+                                prontuario: c.prontuario,
+                                nome_exame: ex.nome || '—', codigo_exame: ex.codigo || '—',
+                                data_solicitacao_exame: dSol || '—',
+                                data_realizacao_exame: dReal || '—',
+                                dias_ate_realizacao: dias,
+                                status_exame: dReal ? '✅ Realizado' : '⏳ Pendente',
+                                tipo_exame: dReal ? 'realizado' : 'pendente'
+                            });
+                        });
+                    }
+                } catch(e) {}
+            }
+        });
+    } else if (tipo === 'primeira-consulta-agendadas') {
+        dados = consultas.filter(function(c) { return (c.tipo_servico || 'P') === 'P' && c.status === 'agendada'; });
+    } else if (tipo === 'primeira-consulta') {
+        dados = consultas.filter(function(c) { return (c.tipo_servico || 'P') === 'P' && c.status === 'recepcionada'; });
+    } else if (tipo === 'aptos-retorno') {
+        dados = gruposOCI.filter(function(g) { return g.p && g.p.status === 'apto_retorno' && !g.r; });
+    } else if (tipo === 'retornos-agendados') {
+        dados = gruposOCI.filter(function(g) { return g.r && g.r.status === 'retorno_agendado'; });
+    } else if (tipo === 'retornos-recepcionados') {
+        dados = gruposOCI.filter(function(g) { return g.r && g.r.status === 'retorno_recepcionado'; });
+    } else if (tipo === 'absenteismo-1consulta') {
+        dados = consultas.filter(function(c) { return (c.tipo_servico || 'P') === 'P' && c.status === 'faltou'; });
+    } else if (tipo === 'absenteismo-retorno') {
+        dados = gruposOCI.filter(function(g) { return g.r && g.r.status === 'retorno_faltou'; });
+    } else if (tipo === 'apac') {
+        dados = consultas.filter(function(c) { return (c.tipo_servico || 'P') === 'P' && c.status === 'oci_fechada'; });
+        const di = document.getElementById('filtroDataInicioAPAC') ? document.getElementById('filtroDataInicioAPAC').value : '';
+        const df = document.getElementById('filtroDataFimAPAC') ? document.getElementById('filtroDataFimAPAC').value : '';
+        if (di) dados = dados.filter(function(c) { return c.data_fechamento && c.data_fechamento >= di; });
+        if (df) dados = dados.filter(function(c) { return c.data_fechamento && c.data_fechamento <= df; });
+    } else if (tipo === 'apacs-geradas') {
+        dados = consultas.filter(function(c) { return (c.tipo_servico || 'P') === 'P' && c.status === 'apac_gerada'; });
+        const di = document.getElementById('filtroDataInicioAPACS') ? document.getElementById('filtroDataInicioAPACS').value : '';
+        const df = document.getElementById('filtroDataFimAPACS') ? document.getElementById('filtroDataFimAPACS').value : '';
+        if (di) dados = dados.filter(function(c) { return c.data_apac && c.data_apac >= di; });
+        if (df) dados = dados.filter(function(c) { return c.data_apac && c.data_apac <= df; });
+    }
+
+    const buscaMap = {
+        'monitoramento':'buscaMonitoramento','monitoramento-exames':'buscaMonitoramentoExames',
+        'primeira-consulta-agendadas':'buscaPrimeiraConsultaAgendadas','primeira-consulta':'buscaPrimeiraConsulta',
+        'aptos-retorno':'buscaAptosRetorno','retornos-agendados':'buscaRetornosAgendados',
+        'retornos-recepcionados':'buscaRetornosRecepcionados','absenteismo-1consulta':'buscaAbsenteismo1Consulta',
+        'absenteismo-retorno':'buscaAbsenteismoRetorno','apac':'buscaAPAC','apacs-geradas':'buscaAPACSGeradas'
+    };
+    const buscaEl = document.getElementById(buscaMap[tipo]);
+    const busca = buscaEl ? buscaEl.value.toLowerCase() : '';
+
+    if (busca) {
+        dados = dados.filter(function(item) {
+            const base = item.p || item.r || item;
+            const pac = pacientes.find(function(x) { return x.id === base.paciente_id; }) || {};
+            const n1 = (item.p ? item.p.numero_solicitacao : base.numero_solicitacao) || '';
+            const n2 = (item.r ? item.r.numero_solicitacao : '') || '';
+            const nome = base.nome_paciente || pac.nome || '';
+            return String(n1).indexOf(busca) !== -1 || String(n2).indexOf(busca) !== -1 ||
+                   (base.prontuario || '').toLowerCase().indexOf(busca) !== -1 ||
+                   (nome || '').toLowerCase().indexOf(busca) !== -1;
+        });
+    }
+
+    if (tipo === 'monitoramento') {
+        const fe = document.getElementById('filtroEspecialidadeMonitoramento') ? document.getElementById('filtroEspecialidadeMonitoramento').value : '';
+        const fs = document.getElementById('filtroStatusMonitoramento') ? document.getElementById('filtroStatusMonitoramento').value : '';
+        if (fe) dados = dados.filter(function(g) { return g.especialidade_id == parseInt(fe); });
+        if (fs) dados = dados.filter(function(g) { return g.statusConsolidado === fs; });
+    }
+    if (tipo === 'monitoramento-exames') {
+        const fse = document.getElementById('filtroStatusExame') ? document.getElementById('filtroStatusExame').value : '';
+        if (fse) dados = dados.filter(function(d) { return d.tipo_exame === fse; });
+    }
+
+    return dados;
+}
+
+function gerarTimeline(status) {
+    const passos = [
+        { label: '1ª Agendada' }, { label: '1ª Recepcionada' }, { label: 'Aguardando Exame' },
+        { label: 'Apto p/ Retorno' }, { label: 'Retorno Agendado' }, { label: 'Retorno Recepcionado' },
+        { label: 'OCI Fechada' }, { label: 'APAC Gerada ✅' }
+    ];
+    const statusMap = {
+        'agendada': 0, 'recepcionada': 1, 'aguardando_exame': 2,
+        'apto_retorno': 3, 'retorno_agendado': 4, 'retorno_recepcionado': 5,
+        'oci_fechada': 6, 'apac_gerada': 7,
+        'faltou': -1, 'retorno_faltou': -1, 'cancelada': -1, 'transferida': -1
+    };
+    const idx = statusMap[status] !== undefined ? statusMap[status] : -1;
+    const total = passos.length;
+
+    if (idx === -1) {
+        const labels = { 'faltou': '🚫 Faltou 1ª', 'retorno_faltou': '🚫 Faltou Ret.', 'cancelada': '❌ Cancelada', 'transferida': '↪️ Transferida' };
+        return '<div class="timeline-container"><span class="text-xs font-bold text-rose-600">' + (labels[status] || status) + '</span></div>';
+    }
+
+    const prog = Math.round(((idx + 1) / total) * 100);
+    let html = '';
+    for (let i = 0; i < total; i++) {
+        let cls = 'step-dot pending';
+        if (i < idx) cls = 'step-dot done';
+        else if (i === idx) cls = 'step-dot active';
+        html += '<div class="' + cls + '" data-tooltip="' + passos[i].label + '"></div>';
+        if (i < total - 1) html += '<div class="step-line ' + (i < idx ? 'done' : '') + '"></div>';
+    }
+    return '<div class="timeline-container"><div class="timeline-steps">' + html + '</div><div class="timeline-label">' + prog + '%</div></div>';
+}
+
+function calcularDiasRestantes(grupo) {
+    const status = grupo.statusConsolidado;
+    const p = grupo.p;
+    if (['oci_fechada','apac_gerada','faltou','retorno_faltou','cancelada','transferida'].indexOf(status) !== -1) {
+        return { texto: '—', classe: 'cinza', icone: status === 'cancelada' ? '❌' : status === 'transferida' ? '🔄' : (status === 'faltou' || status === 'retorno_faltou') ? '🚫' : '⚪' };
+    }
+    if (!p || !p.data_agendada) return { texto: '—', classe: 'cinza', icone: '⚪' };
+    const esp = especialidades.find(function(e) { return e.id === grupo.especialidade_id; }) || {};
+    const prazo = esp.prazo_retorno_dias || 60;
+    const passados = calcularDias(p.data_agendada, getHoje());
+    const rest = prazo - passados;
+    if (rest < 0) return { texto: 'Vencido ' + Math.abs(rest) + 'd', classe: 'vermelho', icone: '🔴' };
+    if (rest <= 15) return { texto: rest + ' dias', classe: 'amarelo', icone: '🟡' };
+    return { texto: rest + ' dias', classe: 'verde', icone: '🟢' };
+}
+
+function getNomesExames(item) {
+    try {
+        const raw = (item && (item.exames_solicitados || item.exames_realizados)) || null;
+        if (!raw || raw === '[]' || raw === 'null') return '—';
+        const arr = typeof raw === 'string' ? JSON.parse(raw) : raw;
+        if (!Array.isArray(arr) || arr.length === 0) return '—';
+        return arr.map(function(ex) { return ex.nome; }).filter(Boolean).join('; ') || '—';
+    } catch(e) { return '—'; }
+}
+
+// ============================================
+// 🔥 MONTAR BOTÕES DE AÇÃO (Fechar / Estornar OCI)
+// ============================================
+function montarBotoesAcao(status, registroId) {
+    if (!podeFecharEstornarOCI()) return '';
+    let botoes = '';
+    if (status === 'retorno_recepcionado') {
+        botoes += '<button onclick="abrirModalFecharOCI(' + registroId + ')" class="btn-fechar-oci"><i class="fas fa-lock"></i> Fechar OCI</button>';
+    }
+    if (status === 'oci_fechada') {
+        botoes += '<button onclick="abrirModalEstornarOCI(' + registroId + ', \'oci_fechada\')" class="btn-estornar-oci"><i class="fas fa-undo"></i> Estornar</button>';
+    }
+    if (status === 'apac_gerada') {
+        botoes += '<button onclick="abrirModalEstornarOCI(' + registroId + ', \'apac_gerada\')" class="btn-estornar-oci"><i class="fas fa-undo"></i> Estornar</button>';
+    }
+    return botoes;
+}
+
+function gerarLinhaTabela(tipo, item) {
+    const p = item.p || item;
+    const r = item.r || null;
+    const pac = pacientes.find(function(x) { return x.id === p.paciente_id; }) || {};
+    const esp = especialidades.find(function(e) { return e.id === p.especialidade_id; }) || {};
+
+    const nomePac = p.nome_paciente || pac.nome || '—';
+    const cpfPac = p.cpf_paciente || pac.cpf || '';
+    const prontPac = p.prontuario || pac.prontuario || '—';
+    const primeiroNome = nomePac.split(' ')[0];
+
+    if (tipo === 'monitoramento') {
+        const dias = calcularDiasRestantes(item);
+        const st = getStatusBadge(item.statusConsolidado);
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-pink-600 text-left">' + (r ? (r.numero_solicitacao || '—') : '<span class="text-slate-300">—</span>') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-left">' + gerarTimeline(item.statusConsolidado) + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 rounded-full text-xs font-bold ' + st.c + '">' + st.t + '</span></td>' +
+            '<td class="px-2 py-2 text-center text-sm font-bold">' + formatarData(p.data_agendada) + '</td>' +
+            '<td class="px-2 py-2 text-center"><span class="status-dias ' + dias.classe + '">' + dias.texto + '</span></td>' +
+            '<td class="px-2 py-2 text-center text-xl">' + dias.icone + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'monitoramento-exames') {
+        const pacEx = pacientes.find(function(x) { return x.id === item.paciente_id; }) || {};
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (item.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + (item.prontuario || pacEx.prontuario || '—') + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + (pacEx.nome || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + item.codigo_exame + ' - ' + item.nome_exame + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + formatarData(item.data_solicitacao_exame) + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + formatarData(item.data_realizacao_exame) + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-left">' + (item.dias_ate_realizacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 rounded-full text-xs font-bold ' + (item.tipo_exame === 'realizado' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700') + '">' + item.status_exame + '</span></td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'primeira-consulta-agendadas') {
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.medico_solicitante || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.local_consulta || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-left">' + formatarData(p.data_agendada) + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.operador_agendamento || '—') + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'primeira-consulta') {
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.unidade_basica_saude || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.medico_solicitante || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.local_consulta || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-cyan-700 text-left">' + (p.data_agendada ? formatarData(p.data_agendada) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-indigo-700 text-left">' + (p.operador_agendamento || '—') + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'aptos-retorno') {
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + primeiroNome + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac).substring(0, 3) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.unidade_basica_saude || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.medico_retorno || p.medico_solicitante || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.local_consulta || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-left">' + formatarData(p.data_agendada) + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.usuario_cadastrou || '—') + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'retornos-agendados') {
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-indigo-600 text-left">' + (r ? (r.numero_solicitacao || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.unidade_basica_saude || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (r ? (r.medico_retorno || r.medico_solicitante || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (r ? (r.local_retorno || r.local_consulta || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + formatarData(p.data_agendada) + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-indigo-700 text-left">' + (r ? formatarData(r.data_agendada) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-xs text-left">' + getNomesExames(p) + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'retornos-recepcionados') {
+        const idRegistro = (r && r.id) ? r.id : (p && p.id ? p.id : null);
+        const botoes = montarBotoesAcao('retorno_recepcionado', idRegistro);
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-teal-600 text-left">' + (r ? (r.numero_solicitacao || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.unidade_basica_saude || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (r ? (r.medico_retorno || r.medico_solicitante || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (r ? (r.local_retorno || r.local_consulta || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-cyan-700 text-left">' + formatarData(p.data_agendada) + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-teal-700 text-left">' + (r ? formatarData(r.data_recepcionada || r.data_agendada) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-xs text-left">' + getNomesExames(p) + '</td>' +
+            '<td class="px-2 py-2 text-left">' + botoes + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'absenteismo-1consulta') {
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.unidade_basica_saude || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.medico_solicitante || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.local_consulta || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-left">' + formatarData(p.data_agendada) + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'absenteismo-retorno') {
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-red-600 text-left">' + (r ? (r.numero_solicitacao || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.unidade_basica_saude || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (r ? (r.medico_retorno || r.medico_solicitante || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (r ? (r.local_retorno || r.local_consulta || '—') : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-red-700 text-left">' + (r ? formatarData(r.data_agendada) : '—') + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'apac') {
+        const idRegistro = p.id || null;
+        const botoes = montarBotoesAcao('oci_fechada', idRegistro);
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.unidade_basica_saude || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.medico_solicitante || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.local_consulta || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + formatarData(p.data_agendada) + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-700 text-left">' + formatarData(p.data_fechamento) + '</td>' +
+            '<td class="px-2 py-2 text-left">' + botoes + '</td>' +
+        '</tr>';
+    }
+
+    if (tipo === 'apacs-geradas') {
+        const idRegistro = p.id || null;
+        const botoes = montarBotoesAcao('apac_gerada', idRegistro);
+        return '<tr class="hover:bg-slate-50 border-b">' +
+            '<td class="px-2 py-2 text-sm font-bold text-blue-600 text-left">' + (p.numero_solicitacao || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-purple-600 text-left">' + prontPac + '</td>' +
+            '<td class="px-2 py-2 font-bold text-sm text-left">' + nomePac + '</td>' +
+            '<td class="px-2 py-2 text-sm font-mono text-left">' + (cpfPac ? formatarCPF(cpfPac) : '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.unidade_basica_saude || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left"><span class="px-2 py-1 bg-blue-50 rounded-full text-xs font-bold">' + (esp.icone || '') + ' ' + (esp.nome || '—') + '</span></td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.medico_solicitante || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + (p.local_consulta || '—') + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + formatarData(p.data_agendada) + '</td>' +
+            '<td class="px-2 py-2 text-sm text-left">' + formatarData(p.data_fechamento) + '</td>' +
+            '<td class="px-2 py-2 text-sm font-bold text-indigo-700 bg-indigo-50 text-left">' + (p.numero_apac || '—') + '</td>' +
+            '<td class="px-2 py-2 text-left">' + botoes + '</td>' +
+        '</tr>';
+    }
+
+    return '<tr><td colspan="20" class="text-center py-4 text-slate-400">Tipo não reconhecido</td></tr>';
+}
+
+function renderizarTabelas() {
+    const tipos = ['monitoramento','monitoramento-exames','primeira-consulta-agendadas','primeira-consulta','aptos-retorno','retornos-agendados','retornos-recepcionados','absenteismo-1consulta','absenteismo-retorno','apac','apacs-geradas'];
+
+    tipos.forEach(function(tipo) {
+        const dados = getDadosFiltrados(tipo);
+        const totalPag = Math.ceil(dados.length / itensPorPagina[tipo]) || 1;
+        if (paginaAtual[tipo] > totalPag) paginaAtual[tipo] = totalPag;
+        const inicio = (paginaAtual[tipo] - 1) * itensPorPagina[tipo];
+        const pag = dados.slice(inicio, inicio + itensPorPagina[tipo]);
+
+        const tid = {
+            'monitoramento':'tabelaMonitoramento','monitoramento-exames':'tabelaMonitoramentoExames',
+            'primeira-consulta-agendadas':'tabelaPrimeiraConsultaAgendadas','primeira-consulta':'tabelaPrimeiraConsulta',
+            'aptos-retorno':'tabelaAptosRetorno','retornos-agendados':'tabelaRetornosAgendados',
+            'retornos-recepcionados':'tabelaRetornosRecepcionados','absenteismo-1consulta':'tabelaAbsenteismo1Consulta',
+            'absenteismo-retorno':'tabelaAbsenteismoRetorno','apac':'tabelaAPAC','apacs-geradas':'tabelaAPACSGeradas'
+        };
+        const pid = {
+            'monitoramento':'paginacaoMonitoramento','monitoramento-exames':'paginacaoMonitoramentoExames',
+            'primeira-consulta-agendadas':'paginacaoPrimeiraConsultaAgendadas','primeira-consulta':'paginacaoPrimeiraConsulta',
+            'aptos-retorno':'paginacaoAptosRetorno','retornos-agendados':'paginacaoRetornosAgendados',
+            'retornos-recepcionados':'paginacaoRetornosRecepcionados','absenteismo-1consulta':'paginacaoAbsenteismo1Consulta',
+            'absenteismo-retorno':'paginacaoAbsenteismoRetorno','apac':'paginacaoAPAC','apacs-geradas':'paginacaoAPACSGeradas'
+        };
+
+        const tEl = document.getElementById(tid[tipo]);
+        const pEl = document.getElementById(pid[tipo]);
+        if (!tEl || !pEl) return;
+
+        if (pag.length === 0) {
+            tEl.innerHTML = '<tr><td colspan="20" class="text-center py-8 text-slate-400 font-bold">Nenhum registro encontrado</td></tr>';
+        } else {
+            tEl.innerHTML = pag.map(function(item) { return gerarLinhaTabela(tipo, item); }).join('');
+        }
+
+        let pagHTML = '';
+        if (totalPag > 1) {
+            for (let i = 1; i <= totalPag; i++) {
+                pagHTML += '<button onclick="paginaAtual[\'' + tipo + '\']=' + i + ';renderizarTabelas();" class="px-3 py-1 rounded-lg text-sm font-bold ' + (i === paginaAtual[tipo] ? 'bg-blue-600 text-white' : 'bg-slate-100 hover:bg-slate-200') + '">' + i + '</button>';
+            }
+        }
+        pEl.innerHTML = '<span class="text-xs text-slate-500">' + dados.length + ' registros | Pág ' + paginaAtual[tipo] + ' de ' + totalPag + '</span><div class="flex gap-1 flex-wrap">' + pagHTML + '</div>';
+    });
+}
+
+function mudarPagina(tipo) {
+    const map = {
+        'monitoramento':'paginaMonitoramento','monitoramento-exames':'paginaMonitoramentoExames',
+        'primeira-consulta-agendadas':'paginaPrimeiraConsultaAgendadas','primeira-consulta':'paginaPrimeiraConsulta',
+        'aptos-retorno':'paginaAptosRetorno','retornos-agendados':'paginaRetornosAgendados',
+        'retornos-recepcionados':'paginaRetornosRecepcionados','absenteismo-1consulta':'paginaAbsenteismo1Consulta',
+        'absenteismo-retorno':'paginaAbsenteismoRetorno','apac':'paginaAPAC','apacs-geradas':'paginaAPACSGeradas'
+    };
+    const sel = document.getElementById(map[tipo]);
+    if (sel) {
+        itensPorPagina[tipo] = parseInt(sel.value);
+        paginaAtual[tipo] = 1;
+        renderizarTabelas();
+    }
+}
+
+function filtrarTabela(tipo) {
+    paginaAtual[tipo] = 1;
+    renderizarTabelas();
+}
+
+function limparFiltroAPAC() {
+    document.getElementById('filtroDataInicioAPAC').value = '';
+    document.getElementById('filtroDataFimAPAC').value = '';
+    filtrarTabela('apac');
+}
+
+function limparFiltroAPACS() {
+    document.getElementById('filtroDataInicioAPACS').value = '';
+    document.getElementById('filtroDataFimAPACS').value = '';
+    filtrarTabela('apacs-geradas');
+}
+
+// ============================================
+// 🔥 NOVO: FECHAR OCI
+// ============================================
+function abrirModalFecharOCI(id) {
+    if (!podeFecharEstornarOCI()) {
+        toast('❌ Apenas Admin ou Admin APAC podem fechar OCI!', 'error');
+        return;
+    }
+    
+    // Procura o registro nas consultas (por id do P ou R)
+    let registro = consultas.find(c => c.id === id);
+    if (!registro) {
+        // Tenta achar pelo R
+        const grupo = gruposOCI.find(g => (g.p && g.p.id === id) || (g.r && g.r.id === id));
+        if (grupo) registro = grupo.r || grupo.p;
+    }
+    
+    if (!registro) { toast('❌ Registro não encontrado!', 'error'); return; }
+    
+    const pac = pacientes.find(x => x.id === registro.paciente_id) || {};
+    const esp = especialidades.find(e => e.id === registro.especialidade_id) || {};
+    const nomePac = registro.nome_paciente || pac.nome || '—';
+    
+    document.getElementById('fecharOCIId').value = id;
+    document.getElementById('fecharOCINumero').textContent = registro.numero_solicitacao || id;
+    document.getElementById('fecharOCIPaciente').textContent = nomePac;
+    document.getElementById('fecharOCIEsp').textContent = (esp.icone || '') + ' ' + (esp.nome || '—');
+    
+    // Reset dos campos
+    document.querySelector('input[name="opcaoFechar"][value="sem_apac"]').checked = true;
+    document.getElementById('fecharOCINumeroAPAC').value = '';
+    document.getElementById('fecharOCIDataAPAC').value = new Date().toISOString().split('T')[0];
+    toggleCampoAPAC();
+    
+    document.getElementById('modalFecharOCI').classList.add('show');
+}
+
+function toggleCampoAPAC() {
+    const opcao = document.querySelector('input[name="opcaoFechar"]:checked').value;
+    const div = document.getElementById('camposAPAC');
+    if (opcao === 'com_apac') {
+        div.classList.remove('hidden');
+    } else {
+        div.classList.add('hidden');
+    }
+}
+
+async function confirmarFecharOCI() {
+    if (!podeFecharEstornarOCI()) return;
+    
+    const id = parseInt(document.getElementById('fecharOCIId').value);
+    const opcao = document.querySelector('input[name="opcaoFechar"]:checked').value;
+    
+    if (opcao === 'com_apac') {
+        const numeroAPAC = document.getElementById('fecharOCINumeroAPAC').value.trim();
+        if (!numeroAPAC) {
+            toast('❌ Informe o Nº da APAC!', 'warning');
+            document.getElementById('fecharOCINumeroAPAC').focus();
+            return;
+        }
+    }
+    
+    showLoading();
+    
+    try {
+        const hoje = new Date().toISOString().split('T')[0];
+        
+        // 🔥 Precisa atualizar o P (1ª consulta), não o R
+        // Busca o P do grupo pelo id passado
+        let idParaAtualizar = id;
+        const grupo = gruposOCI.find(g => (g.p && g.p.id === id) || (g.r && g.r.id === id));
+        if (grupo && grupo.p) {
+            idParaAtualizar = grupo.p.id;
+        }
+        
+        let updateData = {
+            status: opcao === 'com_apac' ? 'apac_gerada' : 'oci_fechada',
+            data_fechamento: hoje,
+            usuario_cadastrou: usuarioLogado.nome,
+            updated_at: new Date().toISOString()
+        };
+        
+        if (opcao === 'com_apac') {
+            updateData.numero_apac = document.getElementById('fecharOCINumeroAPAC').value.trim();
+            const dataAPACInput = document.getElementById('fecharOCIDataAPAC').value;
+            updateData.data_apac = dataAPACInput || hoje;
+            updateData.data_emissao_apac = dataAPACInput || hoje;
+            updateData.usuario_gerou_apac = usuarioLogado.nome;
+        }
+        
+        const { error } = await supabaseClient.from('linha_cuidado').update(updateData).eq('id', idParaAtualizar);
+        
+        hideLoading();
+        
+        if (error) {
+            toast('❌ Erro ao fechar OCI: ' + error.message, 'error');
+            return;
+        }
+        
+        toast(opcao === 'com_apac' 
+            ? '✅ OCI Fechada e APAC Registrada com sucesso!' 
+            : '✅ OCI Fechada com sucesso!', 'success');
+        
+        fecharModal('modalFecharOCI');
+        
+        // Recarrega os dados
+        await carregarDadosSupabase();
+        await atualizarTudo();
+        
+    } catch(e) {
+        hideLoading();
+        console.error(e);
+        toast('❌ Erro inesperado: ' + e.message, 'error');
+    }
+}
+
+// ============================================
+// 🔥 NOVO: ESTORNAR OCI
+// ============================================
+function abrirModalEstornarOCI(id, statusAtual) {
+    if (!podeFecharEstornarOCI()) {
+        toast('❌ Apenas Admin ou Admin APAC podem estornar!', 'error');
+        return;
+    }
+    
+    let textoExplicativo = '';
+    
+    if (statusAtual === 'apac_gerada') {
+        textoExplicativo = 'Tem certeza que deseja estornar esta APAC?';
+        document.getElementById('estornarOCIInfo').textContent = '↩️ Volta para: OCI FECHADA (mantém data de fechamento)';
+    } else if (statusAtual === 'oci_fechada') {
+        textoExplicativo = 'Tem certeza que deseja reabrir esta OCI?';
+        document.getElementById('estornarOCIInfo').textContent = '↩️ Volta para: RETORNO RECEPCIONADO (75%)';
+    } else {
+        toast('❌ Este status não pode ser estornado!', 'error');
+        return;
+    }
+    
+    document.getElementById('estornarOCITexto').textContent = textoExplicativo;
+    document.getElementById('estornarOCIId').value = id;
+    document.getElementById('estornarOCIStatusAtual').value = statusAtual;
+    
+    document.getElementById('modalEstornarOCI').classList.add('show');
+}
+
+async function confirmarEstornarOCI() {
+    if (!podeFecharEstornarOCI()) return;
+    
+    const id = parseInt(document.getElementById('estornarOCIId').value);
+    const statusAtual = document.getElementById('estornarOCIStatusAtual').value;
+    
+    // 🔥 Precisa atualizar o P
+    let idParaAtualizar = id;
+    const grupo = gruposOCI.find(g => (g.p && g.p.id === id) || (g.r && g.r.id === id));
+    if (grupo && grupo.p) {
+        idParaAtualizar = grupo.p.id;
+    }
+    
+    let updateData = {
+        usuario_cadastrou: usuarioLogado.nome,
+        updated_at: new Date().toISOString()
+    };
+    
+    if (statusAtual === 'apac_gerada') {
+        // APAC → OCI Fechada (mantém data de fechamento)
+        updateData.status = 'oci_fechada';
+        updateData.numero_apac = null;
+        updateData.data_apac = null;
+        updateData.data_emissao_apac = null;
+        updateData.usuario_gerou_apac = null;
+    } else if (statusAtual === 'oci_fechada') {
+        // OCI Fechada → Retorno Recepcionado
+        updateData.status = 'retorno_recepcionado';
+        updateData.data_fechamento = null;
+    }
+    
+    showLoading();
+    const { error } = await supabaseClient.from('linha_cuidado').update(updateData).eq('id', idParaAtualizar);
+    hideLoading();
+    
+    if (error) {
+        toast('❌ Erro ao estornar: ' + error.message, 'error');
+        return;
+    }
+    
+    toast('↩️ OCI estornada com sucesso!', 'success');
+    fecharModal('modalEstornarOCI');
+    
+    // Recarrega os dados
+    await carregarDadosSupabase();
+    await atualizarTudo();
+}
+
+// ============================================
+// 🏥 FERRAMENTA OCI v7.0 - PARTE 7
+// Gráficos + Cards + Admin + Inicialização
+// ============================================
+
+function getUltimos6Meses() {
+    const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    const hoje = new Date();
+    const r = [];
+    for (let i = 5; i >= 0; i--) r.push(meses[new Date(hoje.getFullYear(), hoje.getMonth() - i, 1).getMonth()]);
+    return r;
+}
+
+function renderizarGraficos() {
+    Object.values(charts).forEach(function(c) { try { c.destroy(); } catch(e) {} });
+    if (typeof ChartDataLabels === 'undefined') return;
+    try { Chart.register(ChartDataLabels); } catch(e) {}
+
+    const ml = getUltimos6Meses();
+
+    const c1 = document.getElementById('chartPerformance');
+    if (c1) {
+        const porMes = {};
+        ml.forEach(function(m) { porMes[m] = 0; });
+        consultas.filter(function(c) { return c.status === 'oci_fechada' || c.status === 'apac_gerada'; }).forEach(function(c) {
+            if (c.data_fechamento) {
+                try {
+                    const m = new Date(String(c.data_fechamento).split('T')[0] + 'T12:00:00').getMonth();
+                    const nome = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][m];
+                    if (porMes[nome] !== undefined) porMes[nome]++;
+                } catch(e) {}
+            }
+        });
+        charts.p = new Chart(c1.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ml,
+                datasets: [{
+                    label: 'OCIs Fechadas',
+                    data: ml.map(function(m) { return porMes[m] || 0; }),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59,130,246,0.08)',
+                    borderWidth: 3, fill: true, tension: 0.4,
+                    pointRadius: 6, pointBackgroundColor: '#fff',
+                    pointBorderColor: '#3b82f6', pointBorderWidth: 3
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top', labels: { font: { size: 12, weight: 'bold' } } },
+                    datalabels: { anchor: 'end', align: 'top', offset: 4, color: '#1e40af', font: { weight: 'bold', size: 11 }, formatter: function(v) { return v; } }
+                },
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    const c2 = document.getElementById('chartSpecialty');
+    if (c2) {
+        const por = {};
+        gruposOCI.forEach(function(g) {
+            const e = especialidades.find(function(x) { return x.id === g.especialidade_id; });
+            const nome = e ? e.nome : 'Outros';
+            por[nome] = (por[nome] || 0) + 1;
+        });
+        const labels = Object.keys(por).length > 0 ? Object.keys(por) : ['Sem dados'];
+        const values = Object.keys(por).length > 0 ? Object.values(por) : [1];
+        const colors = ['#3b82f6','#8b5cf6','#ef4444','#f59e0b','#10b981','#ec4899','#06b6d4','#f97316'];
+        charts.s = new Chart(c2.getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: labels, datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length), borderWidth: 2, borderColor: '#fff' }] },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '60%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { font: { size: 10, weight: 'bold' }, padding: 10 } },
+                    datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, formatter: function(v, ctx) { const t = ctx.dataset.data.reduce(function(a,b){return a+b;},0); return t === 0 ? '0%' : Math.round((v/t)*100) + '%'; } }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    const c3 = document.getElementById('chartComparecimento');
+    if (c3) {
+        const compareceu = gruposOCI.filter(function(g) { return ['recepcionada','aguardando_exame','apto_retorno','retorno_agendado','retorno_recepcionado','oci_fechada','apac_gerada'].indexOf(g.statusConsolidado) !== -1; }).length;
+        const faltou = gruposOCI.filter(function(g) { return ['faltou','retorno_faltou'].indexOf(g.statusConsolidado) !== -1; }).length;
+        const cancel = gruposOCI.filter(function(g) { return ['cancelada','transferida'].indexOf(g.statusConsolidado) !== -1; }).length;
+        charts.cc = new Chart(c3.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Compareceu', 'Faltou', 'Cancel./Transf.'],
+                datasets: [{ label: 'Grupos OCI', data: [compareceu, faltou, cancel], backgroundColor: ['#10b981','#f59e0b','#ef4444'], borderRadius: 8, borderSkipped: false, barPercentage: 0.6 }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false }, datalabels: { anchor: 'end', align: 'top', color: '#334155', font: { weight: 'bold', size: 13 } } },
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    const c6 = document.getElementById('chartStatus');
+    if (c6) {
+        const sc = {};
+        gruposOCI.forEach(function(g) { const st = getStatusBadge(g.statusConsolidado).t; sc[st] = (sc[st] || 0) + 1; });
+        const labelsSt = Object.keys(sc).length > 0 ? Object.keys(sc) : ['Sem dados'];
+        const valuesSt = Object.keys(sc).length > 0 ? Object.values(sc) : [1];
+        const colorsSt = ['#3b82f6','#f59e0b','#10b981','#6366f1','#14b8a6','#8b5cf6','#f97316','#ef4444'];
+        charts.st = new Chart(c6.getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: labelsSt, datasets: [{ data: valuesSt, backgroundColor: colorsSt.slice(0, labelsSt.length), borderWidth: 2, borderColor: '#fff' }] },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '55%',
+                plugins: {
+                    legend: { display: true, position: 'bottom', labels: { usePointStyle: true, font: { size: 9, weight: 'bold' }, padding: 8 } },
+                    datalabels: { color: '#fff', font: { weight: 'bold', size: 10 }, formatter: function(v, ctx) { const t = ctx.dataset.data.reduce(function(a,b){return a+b;},0); return t === 0 ? '0%' : Math.round((v/t)*100) + '%'; } }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    const c7 = document.getElementById('chartOCIsFechadasMes');
+    if (c7) {
+        const porMesOCI = {};
+        ml.forEach(function(m) { porMesOCI[m] = 0; });
+        consultas.filter(function(c) { return c.status === 'oci_fechada' || c.status === 'apac_gerada'; }).forEach(function(c) {
+            if (c.data_fechamento) {
+                try {
+                    const m = new Date(String(c.data_fechamento).split('T')[0] + 'T12:00:00').getMonth();
+                    const nome = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][m];
+                    if (porMesOCI[nome] !== undefined) porMesOCI[nome]++;
+                } catch(e) {}
+            }
+        });
+        charts.ociMes = new Chart(c7.getContext('2d'), {
+            type: 'bar',
+            data: { labels: ml, datasets: [{ label: 'OCIs Fechadas', data: ml.map(function(m) { return porMesOCI[m] || 0; }), backgroundColor: '#10b981', borderRadius: 8, borderSkipped: false, barPercentage: 0.7 }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top', labels: { font: { size: 12, weight: 'bold' } } },
+                    datalabels: { anchor: 'center', align: 'center', color: '#FFFFFF', font: { weight: 'bold', size: 13 }, formatter: function(v) { return v; } }
+                },
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+
+    const c8 = document.getElementById('chartAPACsGeradasMes');
+    if (c8) {
+        const porMesAPAC = {};
+        ml.forEach(function(m) { porMesAPAC[m] = 0; });
+        consultas.filter(function(c) { return c.status === 'apac_gerada'; }).forEach(function(c) {
+            if (c.data_apac) {
+                try {
+                    const m = new Date(String(c.data_apac).split('T')[0] + 'T12:00:00').getMonth();
+                    const nome = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][m];
+                    if (porMesAPAC[nome] !== undefined) porMesAPAC[nome]++;
+                } catch(e) {}
+            }
+        });
+        charts.apacMes = new Chart(c8.getContext('2d'), {
+            type: 'bar',
+            data: { labels: ml, datasets: [{ label: 'APAC´s Geradas', data: ml.map(function(m) { return porMesAPAC[m] || 0; }), backgroundColor: '#6366f1', borderRadius: 8, borderSkipped: false, barPercentage: 0.7 }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: true, position: 'top', labels: { font: { size: 12, weight: 'bold' } } },
+                    datalabels: { anchor: 'center', align: 'center', color: '#FFFFFF', font: { weight: 'bold', size: 13 }, formatter: function(v) { return v; } }
+                },
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+            },
+            plugins: [ChartDataLabels]
+        });
+    }
+}
+
+function atualizarCardsVisaoGeral() {
+    const statsGrid = document.getElementById('statsGrid');
+    if (!statsGrid) return;
+
+    const fe = document.getElementById('filtroVisaoEspecialidade') ? document.getElementById('filtroVisaoEspecialidade').value : '';
+    let grupos = gruposOCI.slice();
+    if (fe) grupos = grupos.filter(function(g) { return g.especialidade_id == parseInt(fe); });
+
+    const emAnd = grupos.filter(function(g) { return g.statusConsolidado === 'recepcionada'; }).length;
+    const agEx = grupos.filter(function(g) { return g.statusConsolidado === 'aguardando_exame'; }).length;
+    const aptos = grupos.filter(function(g) { return g.statusConsolidado === 'apto_retorno'; }).length;
+    const retAgd = grupos.filter(function(g) { return g.statusConsolidado === 'retorno_agendado'; }).length;
+    const retRec = grupos.filter(function(g) { return g.statusConsolidado === 'retorno_recepcionado'; }).length;
+    const ociFec = grupos.filter(function(g) { return g.statusConsolidado === 'oci_fechada'; }).length;
+    const apacG = grupos.filter(function(g) { return g.statusConsolidado === 'apac_gerada'; }).length;
+    const falt1 = grupos.filter(function(g) { return g.statusConsolidado === 'faltou'; }).length;
+    const faltRet = grupos.filter(function(g) { return g.statusConsolidado === 'retorno_faltou'; }).length;
+    const canc = grupos.filter(function(g) { return g.statusConsolidado === 'cancelada'; }).length;
+    const transf = grupos.filter(function(g) { return g.statusConsolidado === 'transferida'; }).length;
+
+    statsGrid.innerHTML =
+        '<div class="bg-white p-4 rounded-2xl shadow-sm card-blue text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">OCI Aberta</p><h3 class="text-2xl font-extrabold mt-1">' + (emAnd + agEx) + '</h3></div>' +
+        '<div class="bg-white p-4 rounded-2xl shadow-sm card-cyan text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">Aptos Retorno</p><h3 class="text-2xl font-extrabold mt-1">' + aptos + '</h3></div>' +
+        '<div class="bg-white p-4 rounded-2xl shadow-sm card-teal text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">Ret. Recep.</p><h3 class="text-2xl font-extrabold mt-1">' + retRec + '</h3></div>' +
+        '<div class="bg-white p-4 rounded-2xl shadow-sm card-purple text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">OCIs Fechadas</p><h3 class="text-2xl font-extrabold mt-1">' + ociFec + '</h3></div>' +
+        '<div class="bg-white p-4 rounded-2xl shadow-sm card-indigo text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">APAC´s</p><h3 class="text-2xl font-extrabold mt-1">' + apacG + '</h3></div>' +
+        '<div class="bg-white p-4 rounded-2xl shadow-sm card-rose text-center"><p class="text-slate-500 text-[10px] font-bold uppercase">Abs. 1ª</p><h3 class="text-2xl font-extrabold mt-1">' + falt1 + '</h3></div>' +
+        '<div class="bg-white p-4 rounded-2xl shadow-sm" style="border-left:5px solid #dc2626;text-align:center;"><p class="text-slate-500 text-[10px] font-bold uppercase">Abs. Ret.</p><h3 class="text-2xl font-extrabold mt-1">' + faltRet + '</h3></div>' +
+        '<div class="bg-white p-4 rounded-2xl shadow-sm" style="border-left:5px solid #64748b;text-align:center;"><p class="text-slate-500 text-[10px] font-bold uppercase">Cancel./Transf.</p><h3 class="text-2xl font-extrabold mt-1">' + (canc + transf) + '</h3></div>';
+}
+
+function atualizarIndicadores() {
+    const totalGrupos = gruposOCI.length;
+    const ociFec = gruposOCI.filter(function(g) { return g.statusConsolidado === 'oci_fechada' || g.statusConsolidado === 'apac_gerada'; }).length;
+    const pct = totalGrupos > 0 ? Math.round((ociFec / totalGrupos) * 100) : 0;
+
+    const el1 = document.getElementById('indTaxaComparecimento');
+    if (el1) el1.textContent = pct + '%';
+    const el2 = document.getElementById('indTempoMedio');
+    if (el2) el2.textContent = '14 dias';
+    const el3 = document.getElementById('indRetornosRealizados');
+    if (el3) el3.textContent = gruposOCI.filter(function(g) { return g.statusConsolidado === 'retorno_recepcionado'; }).length;
+
+    const pendentes = gruposOCI.filter(function(g) {
+        if (['oci_fechada','apac_gerada','faltou','retorno_faltou','cancelada','transferida'].indexOf(g.statusConsolidado) !== -1) return false;
+        if (!g.p || !g.p.data_agendada) return false;
+        const dias = calcularDias(g.p.data_agendada, getHoje());
+        const esp = especialidades.find(function(x) { return x.id === g.especialidade_id; }) || {};
+        return dias > (esp.prazo_retorno_dias || 60);
+    });
+
+    const el4 = document.getElementById('indOCIsPendentes');
+    if (el4) el4.textContent = pendentes.length;
+    const el5 = document.getElementById('alertCount');
+    if (el5) el5.textContent = pendentes.length;
+}
+
+function atualizarLinhaProducao() {
+    const lp = document.getElementById('linhaProducao');
+    if (!lp) return;
+
+    const emAnd = gruposOCI.filter(function(g) { return g.statusConsolidado === 'recepcionada'; }).length;
+    const agEx = gruposOCI.filter(function(g) { return g.statusConsolidado === 'aguardando_exame'; }).length;
+    const aptos = gruposOCI.filter(function(g) { return g.statusConsolidado === 'apto_retorno'; }).length;
+    const retAgd = gruposOCI.filter(function(g) { return g.statusConsolidado === 'retorno_agendado'; }).length;
+    const retRec = gruposOCI.filter(function(g) { return g.statusConsolidado === 'retorno_recepcionado'; }).length;
+    const ociFec = gruposOCI.filter(function(g) { return g.statusConsolidado === 'oci_fechada'; }).length;
+    const apacG = gruposOCI.filter(function(g) { return g.statusConsolidado === 'apac_gerada'; }).length;
+
+    lp.innerHTML =
+        '<div class="linha-producao-step bg-blue-100 text-blue-700">📋 OCI Aberta: <b>' + (emAnd + agEx) + '</b></div><span class="text-slate-300 font-bold">→</span>' +
+        '<div class="linha-producao-step bg-cyan-100 text-cyan-700">✅ Aptos: <b>' + aptos + '</b></div><span class="text-slate-300 font-bold">→</span>' +
+        '<div class="linha-producao-step bg-indigo-100 text-indigo-700">📅 Agendados: <b>' + retAgd + '</b></div><span class="text-slate-300 font-bold">→</span>' +
+        '<div class="linha-producao-step bg-teal-100 text-teal-700">📋 Recepcionados: <b>' + retRec + '</b></div><span class="text-slate-300 font-bold">→</span>' +
+        '<div class="linha-producao-step bg-emerald-100 text-emerald-700">✔️ Fechada: <b>' + ociFec + '</b></div><span class="text-slate-300 font-bold">→</span>' +
+        '<div class="linha-producao-step bg-purple-100 text-purple-700">📑 APAC: <b>' + apacG + '</b></div>';
+}
+
+function exportarExcel(tipo) {
+    const dados = getDadosFiltrados(tipo);
+    if (dados.length === 0) { toast('⚠️ Nenhum dado para exportar!', 'warning'); return; }
+
+    const podeCompleto = podeVerDadosCompletos();
+    const exportData = dados.map(function(item) {
+        if (item.p) {
+            const p = item.p;
+            const r = item.r;
+            const pac = pacientes.find(function(x) { return x.id === p.paciente_id; }) || {};
+            const esp = especialidades.find(function(e) { return e.id === p.especialidade_id; }) || {};
+            return {
+                'Nº Solicitação 1ª': p.numero_solicitacao || '',
+                'Nº Solicitação Retorno': r ? (r.numero_solicitacao || '') : '',
+                'Prontuário': p.prontuario || pac.prontuario || '',
+                'Paciente': podeCompleto ? (p.nome_paciente || pac.nome || '') : 'Paciente',
+                'CPF': podeCompleto ? (p.cpf_paciente || pac.cpf || '') : '***',
+                'Especialidade': esp.nome || '',
+                'Status': item.statusConsolidado || '',
+                'Data 1ª Cons': p.data_agendada || '',
+                'Data Recep 1ª': p.data_recepcionada || '',
+                'Data Retorno Agendada': r ? (r.data_agendada || '') : '',
+                'Data Retorno Recepcionada': r ? (r.data_recepcionada || '') : '',
+                'Data Fechamento': p.data_fechamento || '',
+                'Médico 1ª': p.medico_solicitante || '',
+                'Local 1ª': p.local_consulta || '',
+                'UBS': p.unidade_basica_saude || '',
+                'Operador Agendamento': p.operador_agendamento || '',
+                'Cadastrado no portal por': p.usuario_cadastrou || '',
+                'Nº APAC': p.numero_apac || '',
+                'Data APAC': p.data_apac || ''
+            };
+        }
+        const pac = pacientes.find(function(x) { return x.id === item.paciente_id; }) || {};
+        const esp = especialidades.find(function(e) { return e.id === item.especialidade_id; }) || {};
+        const row = {
+            'Nº Solicitação': item.numero_solicitacao || '',
+            'Prontuário': item.prontuario || pac.prontuario || '',
+            'Paciente': podeCompleto ? (item.nome_paciente || pac.nome || '') : 'Paciente',
+            'CPF': podeCompleto ? (item.cpf_paciente || pac.cpf || '') : '***',
+            'Especialidade': esp.nome || '',
+            'Status': item.status || '',
+            'Data Agendada': item.data_agendada || '',
+            'Data Recepcionada': item.data_recepcionada || '',
+            'Data Fechamento': item.data_fechamento || '',
+            'Médico': item.medico_solicitante || '',
+            'Local': item.local_consulta || '',
+            'UBS': item.unidade_basica_saude || '',
+            'Operador Agendamento': item.operador_agendamento || '',
+            'Nº APAC': item.numero_apac || ''
+        };
+        if (tipo === 'monitoramento-exames') {
+            row['Exame'] = item.codigo_exame + ' - ' + item.nome_exame;
+            row['Data Solicitação'] = item.data_solicitacao_exame || '';
+            row['Data Realização'] = item.data_realizacao_exame || '';
+            row['Status Exame'] = item.status_exame || '';
+        }
+        return row;
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, tipo.replace(/-/g, '_').substring(0, 31));
+    XLSX.writeFile(wb, 'relatorio_' + tipo.replace(/-/g, '_') + '_' + getHoje() + '.xlsx');
+    toast('✅ Exportado: ' + exportData.length + ' registros', 'success');
+}
+
+function abrirModalAdmin() {
+    if (!usuarioLogado) { toast('❌ Faça login primeiro!', 'error'); return; }
+    if (usuarioLogado.tipo !== 'admin') { toast('❌ Apenas Administradores!', 'error'); return; }
+    document.getElementById('modalAdmin').classList.add('show');
+    switchAdminTab('usuarios');
+    renderizarListaUsuarios();
+    carregarSelectsMigracao();
+}
+
+function switchAdminTab(tabId) {
+    document.querySelectorAll('.admin-tab-btn').forEach(function(b) {
+        b.classList.remove('text-purple-600', 'border-b-2', 'border-purple-600');
+        b.classList.add('text-slate-400');
+    });
+    const tb = document.getElementById('adminTab-' + tabId);
+    if (tb) tb.classList.add('text-purple-600', 'border-b-2', 'border-purple-600');
+    document.querySelectorAll('.admin-content').forEach(function(c) { c.classList.add('hidden'); });
+    const ct = document.getElementById('adminContent-' + tabId);
+    if (ct) ct.classList.remove('hidden');
+    if (tabId === 'logs') renderizarLogs();
+    if (tabId === 'migracao') { carregarSelectsMigracao(); renderizarTabelaAPAC(); }
+}
+
+function toggleUbsField() {
+    const tipo = document.getElementById('adminNovoTipo') ? document.getElementById('adminNovoTipo').value : '';
+    const div = document.getElementById('adminNovoUbsDiv');
+    if (div) div.style.display = tipo === 'usuario' ? 'block' : 'none';
+}
+
+function toggleEditUbsField() {
+    const tipo = document.getElementById('editUsuarioTipo') ? document.getElementById('editUsuarioTipo').value : '';
+    const div = document.getElementById('editUsuarioUbsDiv');
+    if (div) div.style.display = tipo === 'usuario' ? 'block' : 'none';
+}
+
+function carregarUBSnoSelect(selectId) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Selecione a UBS</option>' + LISTA_UBS.map(function(u) { return '<option value="' + u.replace(/'/g, "\\'") + '">' + u + '</option>'; }).join('');
+}
+
+async function renderizarListaUsuarios() {
+    const tbody = document.getElementById('adminTabelaUsuarios');
+    if (!tbody) return;
+    const busca = (document.getElementById('adminBuscaUsuario') ? document.getElementById('adminBuscaUsuario').value : '').toLowerCase();
+    try {
+        const { data: usuarios, error } = await supabaseClient.from('usuarios').select('id, nome, cpf, email, telefone, unidade_saude, tipo').order('nome');
+        if (error) throw error;
+        let lista = (usuarios || []).filter(function(u) {
+            return !busca || u.nome.toLowerCase().indexOf(busca) !== -1 || (u.cpf || '').indexOf(busca) !== -1;
+        });
+        if (!lista.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-slate-400 font-bold">Nenhum usuário encontrado</td></tr>';
+            return;
+        }
+        tbody.innerHTML = lista.map(function(u) {
+            return '<tr class="hover:bg-slate-50 border-t">' +
+                '<td class="px-3 py-2 font-bold text-sm">' + (u.nome || '') + '</td>' +
+                '<td class="px-3 py-2 text-sm font-mono">' + formatarCPF(u.cpf) + '</td>' +
+                '<td class="px-3 py-2 text-sm">' + (u.email || '—') + '</td>' +
+                '<td class="px-3 py-2 text-sm">' + (u.unidade_saude || '—') + '</td>' +
+                '<td class="px-3 py-2"><span class="px-2 py-1 rounded-full text-xs font-bold ' + (u.tipo === 'admin' ? 'bg-purple-100 text-purple-600' : u.tipo === 'admin_apac' ? 'bg-indigo-100 text-indigo-600' : 'bg-blue-100 text-blue-600') + '">' + (u.tipo === 'admin' ? '👑 Admin' : u.tipo === 'admin_apac' ? '📑 Admin APAC' : '👤 Usuário') + '</span></td>' +
+                '<td class="px-3 py-2"><div class="flex gap-2">' +
+                    '<button onclick=\'editarUsuario(' + JSON.stringify(u).replace(/'/g, "&#39;") + ')\' class="text-blue-600 text-xs font-bold">✏️</button>' +
+                    '<button onclick="excluirUsuario(' + u.id + ')" class="text-rose-600 text-xs font-bold">🗑️</button>' +
+                    '<button onclick="gerarTokenRedefinicao(\'' + u.cpf + '\')" class="text-amber-600 text-xs font-bold">🔑</button>' +
+                '</div></td>' +
+            '</tr>';
+        }).join('');
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-6 text-rose-600 font-bold">❌ ' + err.message + '</td></tr>';
+    }
+}
+
+async function cadastrarUsuarioAdmin() {
+    const nome = (document.getElementById('adminNovoNome') || {}).value;
+    const cpf = limparCPF((document.getElementById('adminNovoCPF') || {}).value || '');
+    const email = (document.getElementById('adminNovoEmail') || {}).value;
+    const telefone = ((document.getElementById('adminNovoTelefone') || {}).value || '').replace(/\D/g, '');
+    const senha = (document.getElementById('adminNovoSenha') || {}).value;
+    const tipo = (document.getElementById('adminNovoTipo') || {}).value || 'usuario';
+    const ubs = tipo === 'usuario' ? (document.getElementById('adminNovoUbs') || {}).value : '';
+
+    if (!nome || !cpf || !email || !senha) { toast('⚠️ Preencha todos os campos!', 'warning'); return; }
+    if (!validarCPF(cpf)) { toast('❌ CPF inválido!', 'error'); return; }
+    if (senha.length !== 6) { toast('⚠️ Senha deve ter 6 dígitos!', 'warning'); return; }
+    if (tipo === 'usuario' && !ubs) { toast('❌ Selecione a UBS!', 'warning'); return; }
+
+    showLoading();
+    try {
+        const { data, error } = await supabaseClient.rpc('cadastrar_usuario_painel', {
+            p_nome: nome, p_cpf: cpf, p_email: email, p_telefone: telefone,
+            p_unidade_saude: ubs || '', p_senha: senha, p_tipo: tipo
+        });
+        hideLoading();
+        if (error || !data || !data.success) { toast('❌ ' + (data && data.message ? data.message : error.message), 'error'); return; }
+        toast('✅ Usuário cadastrado!', 'success');
+        ['adminNovoNome','adminNovoCPF','adminNovoEmail','adminNovoTelefone','adminNovoSenha','adminNovoUbs'].forEach(function(id) {
+            const el = document.getElementById(id); if (el) el.value = '';
+        });
+        renderizarListaUsuarios();
+    } catch (err) {
+        hideLoading();
+        toast('❌ Erro ao cadastrar.', 'error');
+    }
+}
+
+function editarUsuario(u) {
+    document.getElementById('editUsuarioId').value = u.id;
+    document.getElementById('editUsuarioNome').value = u.nome;
+    document.getElementById('editUsuarioCPF').value = formatarCPF(u.cpf);
+    document.getElementById('editUsuarioEmail').value = u.email || '';
+    document.getElementById('editUsuarioTelefone').value = u.telefone || '';
+    document.getElementById('editUsuarioSenha').value = '';
+    document.getElementById('editUsuarioTipo').value = u.tipo;
+    const sel = document.getElementById('editUsuarioUbs');
+    if (sel) sel.innerHTML = '<option value="">Selecione a UBS</option>' + LISTA_UBS.map(function(x) { return '<option value="' + x + '"' + (u.unidade_saude === x ? ' selected' : '') + '>' + x + '</option>'; }).join('');
+    toggleEditUbsField();
+    document.getElementById('modalEditarUsuario').classList.add('show');
+}
+
+async function salvarEdicaoUsuario() {
+    const id = parseInt(document.getElementById('editUsuarioId').value);
+    const nome = document.getElementById('editUsuarioNome').value.trim();
+    const email = document.getElementById('editUsuarioEmail').value.trim();
+    const telefone = document.getElementById('editUsuarioTelefone').value.replace(/\D/g, '');
+    const tipo = document.getElementById('editUsuarioTipo').value;
+    const ubs = tipo === 'usuario' ? document.getElementById('editUsuarioUbs').value : '';
+    const novaSenha = document.getElementById('editUsuarioSenha').value.trim();
+
+    showLoading();
+    try {
+        const { error } = await supabaseClient.rpc('atualizar_usuario_seguro', {
+            p_usuario_id: id, p_nome: nome, p_email: email, p_telefone: telefone,
+            p_tipo: tipo, p_unidade_saude: ubs || '', p_nova_senha: novaSenha || null
+        });
+        hideLoading();
+        if (error) { toast('❌ Erro: ' + error.message, 'error'); return; }
+        toast('✅ Usuário atualizado!', 'success');
+        document.getElementById('modalEditarUsuario').classList.remove('show');
+        renderizarListaUsuarios();
+    } catch (err) {
+        hideLoading();
+        toast('❌ Erro ao atualizar.', 'error');
+    }
+}
+
+async function excluirUsuario(id) {
+    if (id === (usuarioLogado ? usuarioLogado.id : -1)) { toast('❌ Não pode excluir a si mesmo!', 'error'); return; }
+    if (!confirm('Excluir este usuário permanentemente?')) return;
+    showLoading();
+    try {
+        const { data, error } = await supabaseClient.rpc('excluir_usuario_seguro', { p_usuario_id: id });
+        hideLoading();
+        if (error || !data || !data.success) { toast('❌ ' + (data && data.message ? data.message : error.message), 'error'); return; }
+        toast('✅ Usuário excluído!', 'success');
+        renderizarListaUsuarios();
+    } catch (err) {
+        hideLoading();
+        toast('❌ Erro ao excluir.', 'error');
+    }
+}
+
+async function gerarTokenRedefinicao(cpf) {
+    if (!cpf) { toast('❌ CPF não informado!', 'error'); return; }
+    showLoading();
+    try {
+        const { data, error } = await supabaseClient.rpc('gerar_codigo_redefinicao_admin_oci', { p_cpf: cpf });
+        hideLoading();
+        if (error || !data || !data.success) { toast('❌ ' + (data && data.message ? data.message : error.message), 'error'); return; }
+        alert('🔑 CÓDIGO GERADO!\n\n📄 CPF: ' + formatarCPF(cpf) + '\n🔢 CÓDIGO: ' + data.codigo + '\n\n⏰ Válido por 1 hora');
+    } catch (err) {
+        hideLoading();
+        toast('❌ Erro ao gerar código.', 'error');
+    }
+}
+
+function carregarSelectsMigracao() {
+    const selM = document.getElementById('migrarSelectUsuario');
+    const selR = document.getElementById('reverterSelectUsuario');
+    if (selM) {
+        selM.innerHTML = '<option value="">Selecione...</option>';
+        supabaseClient.from('usuarios').select('id, nome, cpf, tipo').in('tipo', ['admin', 'usuario']).order('nome')
+            .then(function(res) {
+                if (res.data) res.data.forEach(function(u) {
+                    const opt = document.createElement('option');
+                    opt.value = u.id;
+                    opt.textContent = u.nome + ' (' + formatarCPF(u.cpf) + ') - ' + u.tipo;
+                    selM.appendChild(opt);
+                });
+            });
+    }
+    if (selR) {
+        selR.innerHTML = '<option value="">Selecione...</option>';
+        supabaseClient.from('usuarios').select('id, nome, cpf').eq('tipo', 'admin_apac').order('nome')
+            .then(function(res) {
+                if (res.data) res.data.forEach(function(u) {
+                    const opt = document.createElement('option');
+                    opt.value = u.id;
+                    opt.textContent = u.nome + ' (' + formatarCPF(u.cpf) + ')';
+                    selR.appendChild(opt);
+                });
+            });
+    }
+}
+
+function renderizarTabelaAPAC() {
+    const tbody = document.getElementById('adminTabelaAPAC');
+    if (!tbody) return;
+    supabaseClient.from('usuarios').select('id, nome, cpf, email, unidade_saude, created_at').eq('tipo', 'admin_apac').order('nome')
+        .then(function(res) {
+            if (!res.data || res.data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-slate-400">Nenhum Admin APAC cadastrado</td></tr>';
+                return;
+            }
+            tbody.innerHTML = res.data.map(function(u) {
+                return '<tr class="border-t">' +
+                    '<td class="px-3 py-2 font-bold text-sm">' + u.nome + '</td>' +
+                    '<td class="px-3 py-2 text-sm font-mono">' + formatarCPF(u.cpf) + '</td>' +
+                    '<td class="px-3 py-2 text-sm">' + (u.email || '—') + '</td>' +
+                    '<td class="px-3 py-2 text-sm">' + (u.unidade_saude || '—') + '</td>' +
+                    '<td class="px-3 py-2 text-sm">' + formatarDataHora(u.created_at) + '</td>' +
+                '</tr>';
+            }).join('');
+        });
+}
+
+async function migrarMeuPerfilAdminAPAC() {
+    if (!usuarioLogado) { toast('❌ Faça login!', 'error'); return; }
+    if (usuarioLogado.tipo !== 'admin') { toast('❌ Apenas Administradores!', 'error'); return; }
+    if (!confirm('⚠️ Migrar seu perfil para Admin APAC?')) return;
+    showLoading();
+    try {
+        const { data, error } = await supabaseClient.rpc('migrar_para_admin_apac', { p_usuario_id: usuarioLogado.id });
+        hideLoading();
+        if (error || !data || !data.success) { toast('❌ ' + (data && data.message ? data.message : error.message), 'error'); return; }
+        toast('✅ Perfil migrado para Admin APAC!', 'success');
+        usuarioLogado.tipo = 'admin_apac';
+        atualizarSidebar();
+        atualizarTudo();
+    } catch (err) {
+        hideLoading();
+        toast('❌ Erro ao migrar.', 'error');
+    }
+}
+
+function migrarUsuarioParaAPAC() {
+    const sel = document.getElementById('migrarSelectUsuario');
+    const id = sel ? sel.value : '';
+    if (!id) { toast('⚠️ Selecione um usuário!', 'warning'); return; }
+    if (!confirm('⚠️ Migrar este usuário para Admin APAC?')) return;
+    showLoading();
+    supabaseClient.rpc('migrar_para_admin_apac', { p_usuario_id: parseInt(id) })
+        .then(function(res) {
+            hideLoading();
+            if (res.error || !res.data || !res.data.success) { toast('❌ ' + (res.data && res.data.message ? res.data.message : res.error.message), 'error'); return; }
+            toast('✅ Usuário migrado!', 'success');
+            carregarSelectsMigracao();
+            renderizarTabelaAPAC();
+            renderizarListaUsuarios();
+        });
+}
+
+function reverterUsuarioParaAdmin() {
+    const sel = document.getElementById('reverterSelectUsuario');
+    const id = sel ? sel.value : '';
+    const motivo = (document.getElementById('reverterMotivo') || {}).value || 'Revertido por administrador';
+    if (!id) { toast('⚠️ Selecione um usuário!', 'warning'); return; }
+    if (!confirm('⚠️ Reverter este Admin APAC para Admin comum?')) return;
+    showLoading();
+    supabaseClient.rpc('reverter_admin_apac_para_admin', { p_usuario_id: parseInt(id), p_motivo: motivo })
+        .then(function(res) {
+            hideLoading();
+            if (res.error || !res.data || !res.data.success) { toast('❌ ' + (res.data && res.data.message ? res.data.message : res.error.message), 'error'); return; }
+            toast('✅ Usuário revertido!', 'success');
+            carregarSelectsMigracao();
+            renderizarTabelaAPAC();
+            renderizarListaUsuarios();
+        });
+}
+
+async function renderizarLogs() {
+    const tbody = document.getElementById('adminTabelaLogs');
+    if (!tbody) return;
+    const busca = (document.getElementById('adminBuscaLogs') ? document.getElementById('adminBuscaLogs').value : '').toLowerCase();
+    try {
+        const { data: logs, error } = await supabaseClient.from('logs_auditoria').select('*').order('data_hora', { ascending: false }).limit(100);
+        if (error) throw error;
+        let lista = (logs || []).filter(function(l) {
+            return !busca || (l.acao || '').toLowerCase().indexOf(busca) !== -1 || (l.usuario_nome || '').toLowerCase().indexOf(busca) !== -1 || (l.descricao || '').toLowerCase().indexOf(busca) !== -1;
+        });
+        if (!lista.length) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-slate-400 font-bold">Nenhum log encontrado</td></tr>';
+            return;
+        }
+        tbody.innerHTML = lista.map(function(l) {
+            return '<tr class="hover:bg-slate-50 border-t">' +
+                '<td class="px-3 py-2 text-xs whitespace-nowrap">' + formatarDataHora(l.data_hora) + '</td>' +
+                '<td class="px-3 py-2 text-xs font-bold">' + (l.usuario_nome || 'Sistema') + '</td>' +
+                '<td class="px-3 py-2 text-xs"><span class="px-2 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-700">' + l.acao + '</span></td>' +
+                '<td class="px-3 py-2 text-xs max-w-xs truncate">' + (l.descricao || '—') + '</td>' +
+            '</tr>';
+        }).join('');
+    } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-6 text-rose-600 font-bold">❌ ' + err.message + '</td></tr>';
+    }
+}
+
+function abrirModalRelatorioAPAC() {
+    if (!podeGerarRelatorioAPAC()) { toast('❌ Sem permissão.', 'error'); return; }
+    document.getElementById('modalRelatorioAPAC').classList.add('show');
+    const hoje = new Date();
+    const inicio = new Date(hoje.getFullYear(), hoje.getMonth() - 1, 1);
+    document.getElementById('apacDataInicio').value = inicio.toISOString().split('T')[0];
+    document.getElementById('apacDataFim').value = hoje.toISOString().split('T')[0];
+    document.getElementById('apacStatus').classList.add('hidden');
+    const selEsp = document.getElementById('apacEspecialidade');
+    if (selEsp) selEsp.innerHTML = '<option value="">Todas</option>' + especialidades.map(function(e) { return '<option value="' + e.id + '">' + e.icone + ' ' + e.nome + '</option>'; }).join('');
+    const selUbs = document.getElementById('apacUBS');
+    if (selUbs) selUbs.innerHTML = '<option value="">Todas</option>' + LISTA_UBS.map(function(u) { return '<option value="' + u + '">' + u + '</option>'; }).join('');
+}
+
+async function gerarRelatorioAPAC() {
+    if (!podeGerarRelatorioAPAC()) { toast('❌ Sem permissão.', 'error'); return; }
+    const di = document.getElementById('apacDataInicio').value;
+    const df = document.getElementById('apacDataFim').value;
+    const esp = document.getElementById('apacEspecialidade').value;
+    const ubs = document.getElementById('apacUBS').value;
+    if (!di || !df) { toast('⚠️ Selecione o período!', 'warning'); return; }
+
+    showLoading();
+    try {
+        let q = supabaseClient.from('linha_cuidado').select('*, pacientes(*)').eq('status', 'oci_fechada').eq('tipo_servico', 'P').gte('data_fechamento', di).lte('data_fechamento', df);
+        if (esp) q = q.eq('especialidade_id', parseInt(esp));
+        if (ubs) q = q.eq('unidade_basica_saude', ubs);
+        const { data: ocis, error } = await q.order('data_fechamento', { ascending: false });
+        hideLoading();
+        if (error) { toast('❌ Erro: ' + error.message, 'error'); return; }
+        if (!ocis || ocis.length === 0) { toast('📌 Nenhuma OCI no período.', 'info'); return; }
+
+        const exportData = ocis.map(function(item) {
+            const p = item.pacientes || {};
+            const e = especialidades.find(function(x) { return x.id === item.especialidade_id; }) || {};
+            return {
+                'Nº Solicitação': item.numero_solicitacao || '',
+                'Prontuário': item.prontuario || p.prontuario || '',
+                'Paciente': item.nome_paciente || p.nome || '',
+                'CPF': item.cpf_paciente || p.cpf || '',
+                'Data Nascimento': formatarData(item.data_nascimento || p.data_nascimento),
+                'Nome da Mãe': item.nome_mae || p.nome_mae || '',
+                'Telefone': item.telefone || p.telefone || '',
+                'CEP': item.cep || p.cep || '',
+                'Endereço': item.endereco_completo || p.endereco_completo || '',
+                'Número': item.numero_residencia || p.numero_residencia || '',
+                'Bairro': item.bairro || p.bairro || '',
+                'Município': item.municipio || p.municipio || '',
+                'UF': item.uf || p.uf || '',
+                'Unidade de Saúde': item.unidade_basica_saude || p.unidade_saude || '',
+                'Especialidade': e.nome || '',
+                'Subgrupo SIGTAP': item.subgrupo_sigtap || '',
+                'Médico': item.medico_solicitante || '',
+                'Local': item.local_consulta || '',
+                'Data 1ª Consulta': formatarData(item.data_agendada),
+                'Data Fechamento OCI': formatarData(item.data_fechamento),
+                'Exames': getNomesExames(item),
+                'CID': item.cid || '',
+                'Usuário Cadastrou': item.usuario_cadastrou || ''
+            };
+        });
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'APAC_Completo');
+        XLSX.writeFile(wb, 'relatorio_APAC_completo_' + getHoje() + '.xlsx');
+        toast('✅ Relatório APAC gerado com ' + ocis.length + ' registros!', 'success');
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao gerar relatório.', 'error');
+    }
+}
+
+function buscarGlobal() {
+    const termo = document.getElementById('globalSearch').value.trim().toLowerCase();
+    if (!termo) { atualizarTudo(); return; }
+    const pacEnc = pacientes.filter(function(p) {
+        return (p.prontuario && p.prontuario.toString().indexOf(termo) !== -1) ||
+               (p.nome && p.nome.toLowerCase().indexOf(termo) !== -1) ||
+               (p.cpf && p.cpf.replace(/\D/g, '').indexOf(termo) !== -1);
+    });
+    const ids = new Set(pacEnc.map(function(p) { return p.id; }));
+    const consEnc = consultas.filter(function(c) {
+        return ids.has(c.paciente_id) || (c.numero_solicitacao && c.numero_solicitacao.toString().indexOf(termo) !== -1);
+    });
+    if (consEnc.length === 0) { toast('🔍 Nenhum resultado para: ' + termo, 'info'); return; }
+    const antigas = consultas;
+    const antigosGrupos = gruposOCI;
+    consultas = consEnc;
+    gruposOCI = agruparPorProntuario(consultas);
+    renderizarTabelas();
+    toast('🔍 ' + gruposOCI.length + ' grupo(s) encontrado(s)', 'success');
+    setTimeout(function() { consultas = antigas; gruposOCI = antigosGrupos; renderizarTabelas(); }, 8000);
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🏥 FERRAMENTA OCI v7.0 - INICIANDO...');
+    console.log('👑 Ana Paula Araújo da Silva | Mat: 201704');
+
+    carregarUBSnoSelect('adminNovoUbs');
+    carregarUBSnoSelect('editUsuarioUbs');
+    toggleUbsField();
+
+    const gs = document.getElementById('globalSearch');
+    if (gs) {
+        gs.addEventListener('keydown', function(e) { if (e.key === 'Enter') buscarGlobal(); });
+        gs.addEventListener('input', function(e) { if (!e.target.value.trim()) atualizarTudo(); });
+    }
+
+    ['modalAdmin','modalEditarUsuario','modalRelatorioAPAC','modalFecharOCI','modalEstornarOCI'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('show'); });
+    });
+
+    setInterval(function() { if (usuarioLogado) atualizarTudo(); }, 60000);
+
+    console.log('✅ FERRAMENTA OCI v7.0 PRONTA!');
+});
