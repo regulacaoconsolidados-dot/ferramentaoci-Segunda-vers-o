@@ -2976,21 +2976,34 @@ async function gerarRelatorioAPAC() {
         const exportData = ocis.map(function(item) {
             const p = item.pacientes || {};
             const e = especialidades.find(function(x) { return x.id === item.especialidade_id; }) || {};
+            
+            // 🔥 Função auxiliar para pegar o primeiro valor não vazio
+            const pegar = (...valores) => {
+                for (let v of valores) {
+                    if (v !== null && v !== undefined && v !== '') return v;
+                }
+                return '';
+            };
+            
             return {
                 'Nº Solicitação': item.numero_solicitacao || '',
-                'Prontuário': item.prontuario || p.prontuario || '',
-                'Paciente': item.nome_paciente || p.nome || '',
-                'CPF': item.cpf_paciente || p.cpf || '',
-                'Data Nascimento': formatarData(item.data_nascimento || p.data_nascimento),
-                'Nome da Mãe': item.nome_mae || p.nome_mae || '',
-                'Telefone': item.telefone || p.telefone || '',
-                'CEP': item.cep || p.cep || '',
-                'Endereço': item.endereco_completo || p.endereco_completo || '',
-                'Número': item.numero_residencia || p.numero_residencia || '',
-                'Bairro': item.bairro || p.bairro || '',
-                'Município': item.municipio || p.municipio || '',
-                'UF': item.uf || p.uf || '',
-                'Unidade de Saúde': item.unidade_basica_saude || p.unidade_saude || '',
+                'Prontuário': pegar(item.prontuario, p.prontuario),
+                'Paciente': pegar(item.nome_paciente, p.nome),
+                'CPF': pegar(item.cpf_paciente, p.cpf),
+                'Data Nascimento': formatarData(pegar(item.data_nascimento, p.data_nascimento)),
+                'Nome da Mãe': pegar(item.nome_mae, p.nome_mae),
+                // 🔥 NOVAS COLUNAS: Sexo e Raça/Cor
+                'Sexo': pegar(item.sexo, p.sexo),
+                'Raça/Cor': pegar(item.raca_cor, p.raca_cor),
+                'Telefone': pegar(item.telefone, p.telefone),
+                'CEP': pegar(item.cep, p.cep),
+                'Endereço': pegar(item.endereco_completo, p.endereco_completo),
+                'Número': pegar(item.numero_residencia, p.numero_residencia),
+                'Complemento': pegar(item.complemento, p.complemento),
+                'Bairro': pegar(item.bairro, p.bairro),
+                'Município': pegar(item.municipio, p.municipio),
+                'UF': pegar(item.uf, p.uf),
+                'Unidade de Saúde': pegar(item.unidade_basica_saude, p.unidade_saude),
                 'Especialidade': e.nome || '',
                 'Subgrupo SIGTAP': item.subgrupo_sigtap || '',
                 'Médico': item.medico_solicitante || '',
@@ -3002,6 +3015,18 @@ async function gerarRelatorioAPAC() {
                 'Usuário Cadastrou': item.usuario_cadastrou || ''
             };
         });
+
+        const ws = XLSX.utils.json_to_sheet(exportData);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'APAC_Completo');
+        XLSX.writeFile(wb, 'relatorio_APAC_completo_' + getHoje() + '.xlsx');
+        toast('✅ Relatório APAC gerado com ' + ocis.length + ' registros!', 'success');
+    } catch (err) {
+        hideLoading();
+        console.error(err);
+        toast('❌ Erro ao gerar relatório.', 'error');
+    }
+}
 
         const ws = XLSX.utils.json_to_sheet(exportData);
         const wb = XLSX.utils.book_new();
